@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<templates id="template" xml:space="preserve">
+    <t t-name="point_of_sale.WKMultiCurrButton" owl="1">
+        <span class="control-button btn btn-light rounded-0 fw-bolder" id="wk_display_multi_curr" style="width: 384px;" t-on-click="() => this.onClick()">
+            Multi Currencies ( <t t-esc="currentCurrencyName"/> )
+        </span>
+    </t>
+
+    <t t-name="OrderWidget" t-inherit="point_of_sale.OrderWidget" t-inherit-mode="extension" owl="1">
+        <xpath expr="//span[hasclass('total')]" position="replace">
+            <t t-if= "this.env.services.pos.config.show_currency_on_total">
+                <t t-if ="this.env.services.pos.db.company_currency and this.env.services.pos.db.company_currency.position == 'before'">
+                    <span class="value">
+                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
+                        <t t-esc="total_dis_curr_price" />
+                    </span>/
+                    <span class="wk_display_curr">
+                        <t t-esc="this.env.services.pos.format_currency_no_symbol(props.total)"/>
+                    </span>
+                </t>
+            </t>
+            <t t-else="">
+                <span t-esc="props.total" class="total"/>
+            </t>
+        </xpath>
+    </t>
+
+   <t t-name="ProductCard" t-inherit="point_of_sale.ProductCard" t-inherit-mode="extension" owl="1">
+        <xpath expr="//span[hasclass('price-tag')]" position="replace">
+            <t t-if="this.env.services.pos.config.show_currency_on_product">
+                <span class="price-tag">
+                    <t t-esc="props.price?.formattedUnitPrice" />
+                    /
+                    <span class="wk_display_curr" style="font-size:12px;" t-esc="this.env.services.pos.format_currency_no_symbol(props.price.wkformattedUnitPrice)"/>
+                </span>
+            </t>
+            <t t-else="">
+               <span t-if="props.price" class="price-tag text-primary py-1 fw-bolder" t-esc="props.price" />
+            </t>
+        </xpath>
+    </t>
+
+   <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('product-price')]" position="replace">
+            <t t-if="this.env.services.pos.config.show_currency_on_orderline and this.env.services.pos.get_order().for_orderline == true">
+                <t t-if ="this.env.services.pos.db.company_currency and this.env.services.pos.db.company_currency.position == 'before'">
+                    <span class="line_curr">
+                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
+                        <t t-esc="line_price" />
+                        /
+                       <span class="wk_display_curr"><t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>
+                        </span>
+                    </span>
+                </t>
+                <t t-else=" ">
+                    <span class="line_curr">
+                        <t t-esc="line_price" />
+                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
+                        /
+                       <span class="wk_display_curr">
+                            <t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>
+                        </span>
+                    </span>
+                </t>
+            </t>
+            <t t-else="">
+                <div class="product-price d-inline-block text-end price fw-bolder">
+                    <t t-if="line.price === 'free'">
+                            Free
+                    </t>
+                    <t t-else="" t-esc="line.price"/>
+                </div>
+            </t>
+        </xpath>
+   </t>
+
+    <t t-name="PaymentScreenPaymentLines" t-inherit="point_of_sale.PaymentScreenPaymentLines" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('paymentline') and hasclass('selected')]//div[hasclass('payment-amount')]" position="replace">
+            <t t-if="pos.config.show_currency_on_payment_lines">
+                <div class="payment-amount " style="display: flex;">
+                    <t t-if="line and line.payment_status and ['done', 'waitingCard', 'waiting', 'reversing', 'reversed'].includes(line.payment_status)">
+                        <t t-esc="currency_amount" />/
+                        <div class="wk_display_curr" style="font-size: 13px;"><t t-esc="this.env.services.pos.format_currency_no_symbol(line.get_amount())" /></div> 
+                    </t>
+                    <t t-else="">
+                       <t t-esc="currency_amount" />
+                        /<div class="wk_display_curr">
+                            <t t-esc="formatLineAmount(line)" />
+                            <t t-esc="this.env.services.pos.currency.symbol" />
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="payment-amount" style="display: flex;">
+                    <t t-if="line and line.payment_status and ['done', 'waitingCard', 'waiting', 'reversing', 'reversed'].includes(line.payment_status)">
+                        <t t-esc="this.env.services.pos.format_currency_no_symbol(line.get_amount())" />
+                    </t>
+                    <t t-else="">
+                        <t t-esc="formatLineAmount(line)" />
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="PaymentScreenStatus" t-inherit="point_of_sale.PaymentScreenStatus" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('payment-status-remaining')]" position="replace">
+            <t t-if="this.env.services.pos.config.show_currency_on_payment_status">
+                <div class="payment-status-remaining">
+                    <span class="label">Remaining:</span>
+                    <span class="amount">
+                        <t t-esc="remainingText.curr_res"/>/
+                        <span class="wk_display_curr" style="font-size: 15px;">
+                            <t t-esc="this.env.services.pos.format_currency_no_symbol(remainingText.res)" />
+                        </span>
+                    </span>
+                </div> 
+            </t>
+            <t t-else="">
+                <div class="payment-status-remaining">
+                    <span class="label">Remaining:</span>
+                    <span class="amount"
+                          t-att-class="{ highlight: props.order.get_due() > 0 }">
+                        <t t-esc="remainingText" />
+                    </span>
+                </div> 
+            </t>
+        </xpath>
+
+        <xpath expr="//div[hasclass('payment-status-total-due')]" position="replace">
+            <t t-if="this.env.services.pos.config.show_currency_on_payment_status">
+                <div class="payment-status-total-due">
+                    <span class="label">Total Due:</span>
+                    <span>
+                        <t t-esc="totalDueText.curr_res"/>/
+                        <span class="wk_display_curr" style="font-size: 15px;" >
+                            <t t-esc="this.env.services.pos.format_currency_no_symbol(totalDueText.res)" />
+                        </span>
+                    </span>
+                </div>
+            </t>
+            <t t-else="">
+                 <div class="payment-status-total-due">
+                    <span class="label">Total Due:</span>
+                    <span>
+                        <t t-esc="totalDueText" />
+                    </span>
+                </div>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[hasclass('payment-status-change')]" position="replace">
+            <t t-if="this.env.services.pos.config.show_currency_on_payment_status">
+                <div class="payment-status-change">
+                    <span class="label">Change:</span>
+                    <span class="amount">
+                        <t t-if="changeText.res and changeText.curr_res">
+                            <t t-esc="changeText.res" />/
+                            <span class="wk_display_curr" style="font-size: 15px;" >
+                                <t t-esc="changeText.curr_res"/>
+                                <t t-esc="this.env.services.pos.currency.symbol" />
+                            </span>
+                        </t>
+                    </span>
+                </div>
+            </t>
+            <t t-else=" ">
+                 <div class="payment-status-change">
+                    <span class="label">Change:</span>
+                    <span class="amount"
+                          t-att-class="{ highlight: props.order.get_change() > 0 }">
+                        <t t-esc="changeText" />
+                    </span>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('before-footer')]" position="before">
+            <t t-if="props.data and this.env.services.pos.config.enable_display_multi_curr">
+                <div class="wk_reciept_disp_curr ">
+                    Default Total 
+                    <span class="inside_span pos-receipt-right-align wk_display_curr">
+                        <t t-if="this.env.services.pos.db.company_currency and this.env.services.pos.db.company_currency.position == 'before' and this.env.services.pos.db.company_currency?.symbol">
+                            <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
+                            <t t-esc="props.data.prev_total" />
+                        </t>
+                        <t t-else=""> 
+                            <t t-esc="props.data.prev_total" />
+                            <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
+                        </t>
+                    </span>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="pos_display_multi_currency.WkDisplaycCurrmultiPopup" owl="1">
+       <div class="popup popup-textarea">
+            <div class="popup popup-textinput wk_curr_outer_div">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        Multi Currencies
+                    </h4>
+                </div>
+                <div class="wk_body_div">
+                    Select a Currency 
+                    <div class="curr_list">
+                        <label for="Currencies">Currencies:</label>
+                        <select name="Currencies" id="wk_currencies">
+                            <t t-if="pos.db.wk_display_curr_ids">
+                                <t t-foreach="pos.db.wk_display_curr_ids" t-as="currency" t-key="currency.id">
+                                    <t t-if="currency.id !== pos.db?.company_currency?.id">
+                                        <option t-att-value="currency.name" t-att-id = "currency.id">
+                                            <t t-esc="currency.name" />
+                                        </option>
+                                    </t>
+                                </t>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <footer class="footer footer-flex modal-footer">
+                    <button class="button cancel btn btn-lg btn-secondary" t-on-click="cancel">
+                        Cancel
+                    </button>
+                    <button class="button confirm btn btn-lg btn-primary" t-on-click="wk_change_currency">
+                        Apply
+                    </button>
+                </footer>
+            </div>
+        </div>
+    </t>
+</templates>
