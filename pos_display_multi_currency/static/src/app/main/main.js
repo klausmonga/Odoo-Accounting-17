@@ -199,7 +199,7 @@ patch(Product.prototype, {
                 var wk_amount;
                 var amount = this?.get_display_price(this.pricelist, 1);
                 if (pos.currency && pos.prev_currency)
-                    wk_amount = (amount * pos.currency.rate) / pos.prev_currency.rate;
+                    wk_amount = (amount / pos.currency.rate);
                 var formattedUnitPrice = pos.wk_format_currency(
                     amount,
                     'Product Price'
@@ -278,7 +278,7 @@ patch(Orderline.prototype, {
         );
         // ---added---code-----
          if (self.pos.config.enable_display_multi_curr) {
-             order_line_price = (order_line_price * self.pos.currency.rate) / self.pos.prev_currency.rate;
+             order_line_price = (order_line_price / self.pos.currency.rate);
          }
         // ----end---of---code
         order_line_price = round_di(orderline.compute_fixed_price(order_line_price), this.pos.currency.decimal_places);
@@ -311,7 +311,7 @@ patch(Orderline.prototype, {
         var result = super.set_unit_price(...arguments)
         if (!self.display_curr_change) {
             self.prev_price = self.product.lst_price;
-            this.price = ((self.product.lst_price * self.env.services.pos.currency.rate) / self.env.services.pos.prev_currency.rate);
+            this.price = (self.product.lst_price / self.env.services.pos.currency.rate);
         }
         return result
     },

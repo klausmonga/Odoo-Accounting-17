@@ -36,7 +36,7 @@ export class WkDisplaycCurrmultiPopup extends AbstractAwaitablePopup {
             self.props.selected_currency = sel_curr_data[0];
             if (order) {
                 order.get_orderlines().forEach(line => {
-                    line.set_unit_price((line.prev_price * self.env.services.pos.currency.rate) / self.env.services.pos.prev_currency.rate);
+                    line.set_unit_price(line.prev_price / self.env.services.pos.currency.rate);
                     line.price_manually_set = true;
                 });
             }
