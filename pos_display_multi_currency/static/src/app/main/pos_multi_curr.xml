@@ -44,37 +44,37 @@
     </t>
 
    <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
-        <xpath expr="//div[hasclass('product-price')]" position="replace">
-            <t t-if="this.env.services.pos.config.show_currency_on_orderline and this.env.services.pos.get_order().for_orderline == true">
-                <t t-if ="this.env.services.pos.db.company_currency and this.env.services.pos.db.company_currency.position == 'before'">
-                    <span class="line_curr">
-                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
-                        <t t-esc="line_price" />
-                        /
-                       <span class="wk_display_curr"><t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>
-                        </span>
-                    </span>
-                </t>
-                <t t-else=" ">
-                    <span class="line_curr">
-                        <t t-esc="line_price" />
-                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />
-                        /
-                       <span class="wk_display_curr">
-                            <t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>
-                        </span>
-                    </span>
-                </t>
-            </t>
-            <t t-else="">
-                <div class="product-price d-inline-block text-end price fw-bolder">
-                    <t t-if="line.price === 'free'">
-                            Free
-                    </t>
-                    <t t-else="" t-esc="line.price"/>
-                </div>
-            </t>
-        </xpath>
+<!--        <xpath expr="//div[hasclass('product-price')]" position="replace">-->
+<!--            <t t-if="this.env.services.pos.config.show_currency_on_orderline and this.env.services.pos.get_order().for_orderline == true">-->
+<!--                <t t-if ="this.env.services.pos.db.company_currency and this.env.services.pos.db.company_currency.position == 'before'">-->
+<!--                    <span class="line_curr">-->
+<!--                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />-->
+<!--                        <t t-esc="line_price" />-->
+<!--                        /-->
+<!--                       <span class="wk_display_curr"><t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>-->
+<!--                        </span>-->
+<!--                    </span>-->
+<!--                </t>-->
+<!--                <t t-else=" ">-->
+<!--                    <span class="line_curr">-->
+<!--                        <t t-esc="line_price" />-->
+<!--                        <t t-esc="this.env.services.pos.db.company_currency?.symbol" />-->
+<!--                        /-->
+<!--                       <span class="wk_display_curr">-->
+<!--                            <t t-esc="this.env.services.pos.format_currency_no_symbol(line.price,'Product Price',this.env.services.pos.currency)"/>-->
+<!--                        </span>-->
+<!--                    </span>-->
+<!--                </t>-->
+<!--            </t>-->
+<!--            <t t-else="">-->
+<!--                <div class="product-price d-inline-block text-end price fw-bolder">-->
+<!--                    <t t-if="line.price === 'free'">-->
+<!--                            Free-->
+<!--                    </t>-->
+<!--                    <t t-else="" t-esc="line.price"/>-->
+<!--                </div>-->
+<!--            </t>-->
+<!--        </xpath>-->
    </t>
 
     <t t-name="PaymentScreenPaymentLines" t-inherit="point_of_sale.PaymentScreenPaymentLines" t-inherit-mode="extension" owl="1">
