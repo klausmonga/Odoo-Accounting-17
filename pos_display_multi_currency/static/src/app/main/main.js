@@ -310,8 +310,8 @@ patch(Orderline.prototype, {
         var self = this;
         var result = super.set_unit_price(...arguments)
         if (!self.display_curr_change) {
-            self.prev_price = self.product.lst_price;
-            this.price = (self.product.lst_price / self.env.services.pos.currency.rate);
+            self.prev_price = this.product.get_display_price(this.pricelist, 1);
+            this.price = (this.product.get_display_price(this.pricelist, 1) / self.env.services.pos.currency.rate);
         }
         return result
     },
@@ -319,7 +319,7 @@ patch(Orderline.prototype, {
         var self=this;
         return {
             ...super.getDisplayData(),
-            prev_price:  self.product.lst_price,
+            prev_price:  this.product.get_display_price(this.pricelist, 1),
         };
     }
 });
